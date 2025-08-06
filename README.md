@@ -1,4 +1,4 @@
-# 📢 Lux Anuncios - Advanced Announcement System
+# 📢 Lux Announces - Advanced Announcement System
 
 A modern and feature-rich announcement system for FiveM servers using ESX framework. This resource allows players with specific job permissions to create and broadcast announcements with customizable categories, durations, and visibility settings.
 
@@ -36,10 +36,10 @@ A modern and feature-rich announcement system for FiveM servers using ESX framew
 
 ## 🚀 Installation
 
-1. **Download** the resource and place it in your `resources/[lsx]/` folder
+1. **Download** the resource and place it in your `resources` folder
 2. **Add** the following line to your `server.cfg`:
    ```
-   ensure lux-anuncios
+   ensure lux-annpimces
    ```
 3. **Configure** the resource by editing `config.lua`
 4. **Restart** your server
