@@ -32,7 +32,7 @@ A modern and feature-rich announcement system for FiveM servers using ESX framew
 
 - **ESX Framework**: Latest version
 - **ox_lib**: For notifications and UI components
-- **mysql-async**: For database operations (if needed)
+- **ox_mysql**: For database operations (if needed)
 
 ## 🚀 Installation
 
