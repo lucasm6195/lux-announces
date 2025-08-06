@@ -1,6 +1,7 @@
 # 📢 Lux Announces - Advanced Announcement System
 
 A modern and feature-rich announcement system for FiveM servers using ESX framework. This resource allows players with specific job permissions to create and broadcast announcements with customizable categories, durations, and visibility settings.
+<img width="1002" height="603" alt="image" src="https://github.com/user-attachments/assets/9598e81c-7cf8-4ea7-870b-795d760c66bc" />
 
 ## ✨ Features
 
