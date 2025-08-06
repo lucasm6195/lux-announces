@@ -1,6 +1,8 @@
 fx_version 'cerulean'
 games { 'gta5' }
-author 'mano.6195'
+author 'lucasm.6195'
+discord 'https://discord.gg/F29Y9DYm2R'
+website 'https://lucasm6195.shop/'
 lua54 'yes'
 
 client_scripts {
