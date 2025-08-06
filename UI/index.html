@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Announcements</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Normal announcement -->
+    <div class="anuncio-box" id="anuncio" style="display: none;">
+        <img id="anuncioImagen" src="" alt="Announcement image" class="anuncio-img">
+        <div id="anuncioCategory" class="anuncio-category" style="display: none;"></div>
+        
+        <!-- Separate title container -->
+        <div class="anuncio-title-container">
+            <h1 class="anuncio-title" id="anuncioTitulo">Announcement Title</h1>
+        </div>
+        
+        <!-- Separate content container -->
+        <div class="anuncio-content-container">
+            <p class="anuncio-content" id="anuncioContenido">Announcement content...</p>
+        </div>
+        
+        <div class="marker" onclick="markOnGPS()">
+            <span class="marker-h">H</span> 
+            <svg class="marker-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span class="marker-text">Mark on GPS</span>
+        </div>
+    </div>
+
+    <!-- Enhanced creation interface -->
+    <div class="create-interface" id="createInterface">
+        <div class="interface-container">
+            <!-- Header -->
+            <div class="interface-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+                        </svg>
+                    </div>
+                    <div class="header-text">
+                        <h2 class="header-title">Create Announcement</h2>
+                        <p class="header-subtitle">Publish your announcement for the entire city</p>
+                    </div>
+                </div>
+                <button class="close-button" onclick="closeCreateInterface()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="interface-content">
+                <!-- Left Panel - Form -->
+                <div class="form-panel">
+                    <!-- Job Info Card -->
+                    <div class="job-card">
+                        <div class="job-card-header">
+                            <div class="job-avatar">
+                                <img id="jobAvatar" src="/placeholder.svg" alt="Job Logo">
+                            </div>
+                            <div class="job-info">
+                                <h3 class="job-name" id="jobNameDisplay">Loading...</h3>
+                                <div class="job-status">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20,6 9,17 4,12"/>
+                                    </svg>
+                                    Permissions verified
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label class="form-label category-label">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" id="enableCategory" onchange="toggleCategorySection()">
+                                    <div class="checkbox-indicator">
+                                        <svg class="checkbox-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20,6 9,17 4,12"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 0 1 0 2.828l-7 7a2 2 0 0 1-2.828 0l-7-7A1.99 1.99 0 0 1 2 12V7a5 5 0 0 1 5-5z"/>
+                                </svg>
+                                Announcement Category (Optional)
+                            </label>
+                            
+                            <div class="category-section" id="categorySection" style="display: none;">
+                                <div class="custom-category-fields">
+                                    <div class="field-group">
+                                        <label class="field-label">Tag name:</label>
+                                        <input type="text" id="customCategoryName" class="custom-input" placeholder="Ex: My Business" maxlength="20" oninput="updateCustomCategoryPreview()">
+                                    </div>
+                                    
+                                    <div class="field-group">
+                                        <label class="field-label">Color:</label>
+                                        <div class="color-input-group">
+                                            <input type="color" id="customCategoryColor" class="color-picker" value="#3498db" oninput="updateCustomCategoryPreview()">
+                                            <input type="text" id="customCategoryColorText" class="color-text" value="#3498db" oninput="updateCustomCategoryColorFromText()">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="custom-category-preview" id="customCategoryPreview">
+                                        <div class="preview-tag">
+                                            <span class="preview-text">Preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10,9 9,9 8,9"/>
+                                </svg>
+                                Announcement Content
+                            </label>
+                            <div class="textarea-container">
+                                <textarea 
+                                    class="form-textarea" 
+                                    id="announceContent" 
+                                    placeholder="Write your announcement content here..."
+                                    oninput="updatePreview()"
+                                    maxlength="200"
+                                ></textarea>
+                                <div class="character-count">
+                                    <span id="charCount">0</span>/200
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12,6 12,12 16,14"/>
+                                </svg>
+                                Announcement Duration
+                            </label>
+                            <div class="custom-select" onclick="toggleDropdown('durationDropdown')">
+                                <div class="select-display" id="durationDisplay">10 seconds</div>
+                                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6,9 12,15 18,9"/>
+                                </svg>
+                                <div class="select-dropdown" id="durationDropdown">
+                                    <div class="select-option" data-value="5" onclick="selectDuration(5, '5 seconds')">5 seconds</div>
+                                    <div class="select-option selected" data-value="10" onclick="selectDuration(10, '10 seconds')">10 seconds</div>
+                                    <div class="select-option" data-value="15" onclick="selectDuration(15, '15 seconds')">15 seconds</div>
+                                    <div class="select-option" data-value="20" onclick="selectDuration(20, '20 seconds')">20 seconds</div>
+                                    <div class="select-option" data-value="30" onclick="selectDuration(30, '30 seconds')">30 seconds</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                Announcement Visibility
+                            </label>
+                            <div class="custom-select" onclick="toggleDropdown('visibilityDropdown')">
+                                <div class="select-display" id="visibilityDisplay">Visible to everyone</div>
+                                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6,9 12,15 18,9"/>
+                                </svg>
+                                <div class="select-dropdown" id="visibilityDropdown">
+                                    <!-- Options will be generated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="cancel-button" onclick="closeCreateInterface()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                                Cancel
+                            </button>
+                            <button class="publish-button" id="publishBtn" onclick="createAnnounce()" disabled>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 2L11 13"/>
+                                    <polygon points="22,2 15,22 11,13 2,9 22,2"/>
+                                </svg>
+                                Publish Announcement
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Preview -->
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Preview</span>
+                    </div>
+                    
+                    <div class="preview-container">
+                        <div class="preview-ad">
+                            <img id="previewImage" src="/placeholder.svg" alt="Logo" class="preview-ad-img">
+                            <h1 class="preview-ad-title" id="previewTitle">Job Name</h1>
+                            <p class="preview-ad-content" id="previewContent">The announcement content will appear here...</p>
+                            <div class="preview-marker">
+                                <span class="preview-marker-h">H</span>
+                                <svg class="preview-marker-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                Mark on GPS
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-info">
+                        <div class="info-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12,6 12,12 16,14"/>
+                            </svg>
+                            <span id="durationInfo">Duration: 10 seconds</span>
+                        </div>
+                        <div class="info-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <span id="visibilityInfo">Visible to everyone</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
