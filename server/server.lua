@@ -89,10 +89,10 @@ RegisterCommand('listjobs', function(source, args)
     end
 end, true)
 
--- Command to open the announcement creation interface (configurable)
 RegisterCommand(Config.Command, function(source, args)
     local xPlayer = ESX.GetPlayerFromId(source)
     local jobName = xPlayer.job.name
+    local jobGrade = xPlayer.job.grade
     local jobInfo = announces[jobName]
 
     if not jobInfo then
@@ -104,13 +104,23 @@ RegisterCommand(Config.Command, function(source, args)
         return
     end
 
-    -- Get all available jobs
+    local minGrade = jobInfo.minGrade or 0
+    if jobGrade < minGrade then
+        TriggerClientEvent('ox_lib:notify', source, {
+            position = 'bottom-right',
+            description = Config.Texts.Notifications.InsufficientRank,
+            type = 'error'
+        })
+        return
+    end
+
     local availableJobs = getAllJobs()
 
-    -- Send job data to client to open interface
     TriggerClientEvent('lux-announces:openCreateInterface', source, {
         jobName = jobInfo.name,
         jobImage = jobInfo.image,
+        jobGrade = jobGrade,
+        minGrade = minGrade,
         availableJobs = availableJobs,
         config = {
             enableCategories = Config.EnableCategories,

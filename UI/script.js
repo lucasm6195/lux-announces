@@ -96,7 +96,11 @@ function openCreateInterface(jobData) {
     updateInterfaceTexts()
   }
 
-  jobNameDisplay.innerText = jobData.jobName
+  const jobDisplayText = jobData.jobGrade !== undefined ? 
+    `${jobData.jobName} (Rank ${jobData.jobGrade})` : 
+    jobData.jobName
+  
+  jobNameDisplay.innerText = jobDisplayText
   jobAvatar.src = jobData.jobImage
   previewTitle.innerText = jobData.jobName
   previewImage.src = jobData.jobImage

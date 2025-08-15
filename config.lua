@@ -74,6 +74,7 @@ Config.Texts = {
     -- Server notifications
     Notifications = {
         NoPermission = "You don't have permission to make announcements.",
+        InsufficientRank = "Your rank is insufficient to create announcements.",
         NoContent = "You haven't entered content for the announcement.",
         PublishSuccess = "Announcement%s published for %s.",
         PublishSuccessWithCategory = " with category \"%s\"",
@@ -99,22 +100,26 @@ Config.Texts = {
 Config.Announces = {
     unemployed = { 
         name = "Autoexotic", 
-        image = "https://vignette.wikia.nocookie.net/de.gta/images/5/5c/Auto-Exotic-Logo.png/revision/latest?cb=20160715173735" 
+        image = "https://vignette.wikia.nocookie.net/de.gta/images/5/5c/Auto-Exotic-Logo.png/revision/latest?cb=20160715173735",
+        minGrade = 0
     },
     -- Add more jobs here following the format:
-    -- jobname = { name = "Job Name", image = "Image_URL" },
+    -- jobname = { name = "Job Name", image = "Image_URL", minGrade = 0 },
     
     -- Examples:
     -- police = { 
     --     name = "LSPD", 
-    --     image = "https://example.com/police-logo.png" 
+    --     image = "https://example.com/police-logo.png",
+    --     minGrade = 2  -- Only sergeants and above can create announcements
     -- },
     -- ambulance = { 
     --     name = "EMS", 
-    --     image = "https://example.com/ems-logo.png" 
+    --     image = "https://example.com/ems-logo.png",
+    --     minGrade = 1  -- Only paramedics and above
     -- },
     -- mechanic = { 
     --     name = "Mechanic", 
-    --     image = "https://example.com/mechanic-logo.png" 
+    --     image = "https://example.com/mechanic-logo.png",
+    --     minGrade = 0  -- All ranks can create announcements
     -- },
 }
