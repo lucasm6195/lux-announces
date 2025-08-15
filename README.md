@@ -2,6 +2,8 @@
 
 A modern and feature-rich announcement system for FiveM servers using ESX framework. This resource allows players with specific job permissions to create and broadcast announcements with customizable categories, durations, and visibility settings.
 
+<img width="1920" height="1440" alt="232shots_so" src="https://github.com/user-attachments/assets/179e6122-cab0-4cee-afa0-9cdde27594aa" />
+
 ## ✨ Features
 
 ### 🎯 Core Functionality
