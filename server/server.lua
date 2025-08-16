@@ -1,12 +1,46 @@
 local announces = Config.Announces
 local jobsCache = {}
 local lastCacheUpdate = 0
+local ESX = nil
+local QBCore = nil
 
--- Function to get all available jobs from database with caching
+if Config.Framework == 'esx' then
+    ESX = exports['es_extended']:getSharedObject()
+elseif Config.Framework == 'qbcore' then
+    QBCore = exports['qb-core']:GetCoreObject()
+end
+
+local function getPlayerData(source)
+    if Config.Framework == 'esx' then
+        return ESX.GetPlayerFromId(source)
+    elseif Config.Framework == 'qbcore' then
+        return QBCore.Functions.GetPlayer(source)
+    end
+end
+
+local function getPlayerJob(playerData)
+    if Config.Framework == 'esx' then
+        return playerData.job.name, playerData.job.grade, playerData.job.label
+    elseif Config.Framework == 'qbcore' then
+        return playerData.PlayerData.job.name, playerData.PlayerData.job.grade.level, playerData.PlayerData.job.label
+    end
+end
+
+local function sendNotification(source, message, type)
+    if Config.Framework == 'esx' then
+        TriggerClientEvent('ox_lib:notify', source, {
+            position = 'bottom-right',
+            description = message,
+            type = type
+        })
+    elseif Config.Framework == 'qbcore' then
+        TriggerClientEvent('QBCore:Notify', source, message, type)
+    end
+end
+
 local function getAllJobs()
     local currentTime = GetGameTimer()
     
-    -- Check if cache is still valid
     if currentTime - lastCacheUpdate < (Config.JobsCacheDuration or 300000) and #jobsCache > 0 then
         return jobsCache
     end
@@ -14,7 +48,6 @@ local function getAllJobs()
     local jobs = {}
     local tableName = Config.JobsTableName or 'jobs'
     
-    -- Get jobs from database synchronously
     local success, dbJobs = pcall(function()
         return MySQL.Sync.fetchAll('SELECT name, label FROM ' .. tableName .. ' WHERE name != ?', {'unemployed'})
     end)
@@ -28,15 +61,13 @@ local function getAllJobs()
         end
         print(string.format("^5[^7DATABASE^5]^7 Loaded ^2%d^7 jobs from database", #jobs))
     else
-        -- Fallback: get jobs from connected players if database query fails
-        print("[lux-announces] Warning: Could not fetch jobs from database, using connected players as fallback")
+        print("Warning: Could not fetch jobs from database, using connected players as fallback")
         
         local connectedJobs = {}
         for _, playerId in ipairs(GetPlayers()) do
-            local xPlayer = ESX.GetPlayerFromId(tonumber(playerId))
-            if xPlayer then
-                local jobName = xPlayer.job.name
-                local jobLabel = xPlayer.job.label
+            local playerData = getPlayerData(tonumber(playerId))
+            if playerData then
+                local jobName, jobGrade, jobLabel = getPlayerJob(playerData)
                 
                 if jobName ~= 'unemployed' and not connectedJobs[jobName] then
                     connectedJobs[jobName] = {
@@ -50,24 +81,21 @@ local function getAllJobs()
         for _, job in pairs(connectedJobs) do
             table.insert(jobs, job)
         end
-        print(string.format("[lux-announces] Fallback: Found %d jobs from connected players", #jobs))
+        print(string.format("Fallback: Found %d jobs from connected players", #jobs))
     end
     
-    -- Sort alphabetically by label
     table.sort(jobs, function(a, b)
         return a.label < b.label
     end)
     
-    -- Update cache
     jobsCache = jobs
     lastCacheUpdate = currentTime
     
     return jobs
 end
 
--- Command to refresh jobs cache (for administrators)
 RegisterCommand('refreshjobs', function(source, args)
-    if source == 0 then -- Console only
+    if source == 0 then
         jobsCache = {}
         lastCacheUpdate = 0
         local jobs = getAllJobs()
@@ -78,9 +106,8 @@ RegisterCommand('refreshjobs', function(source, args)
     end
 end, true)
 
--- Command to list available jobs (for debugging)
 RegisterCommand('listjobs', function(source, args)
-    if source == 0 then -- Console only
+    if source == 0 then
         local jobs = getAllJobs()
         print(string.format("[lux-announces] Available jobs (%d):", #jobs))
         for _, job in ipairs(jobs) do
@@ -90,27 +117,20 @@ RegisterCommand('listjobs', function(source, args)
 end, true)
 
 RegisterCommand(Config.Command, function(source, args)
-    local xPlayer = ESX.GetPlayerFromId(source)
-    local jobName = xPlayer.job.name
-    local jobGrade = xPlayer.job.grade
+    local playerData = getPlayerData(source)
+    if not playerData then return end
+    
+    local jobName, jobGrade, jobLabel = getPlayerJob(playerData)
     local jobInfo = announces[jobName]
 
     if not jobInfo then
-        TriggerClientEvent('ox_lib:notify', source, {
-            position = 'bottom-right',
-            description = Config.Texts.Notifications.NoPermission,
-            type = 'error'
-        })
+        sendNotification(source, Config.Texts.Notifications.NoPermission, 'error')
         return
     end
 
     local minGrade = jobInfo.minGrade or 0
     if jobGrade < minGrade then
-        TriggerClientEvent('ox_lib:notify', source, {
-            position = 'bottom-right',
-            description = Config.Texts.Notifications.InsufficientRank,
-            type = 'error'
-        })
+        sendNotification(source, Config.Texts.Notifications.InsufficientRank, 'error')
         return
     end
 
@@ -133,32 +153,34 @@ RegisterCommand(Config.Command, function(source, args)
     })
 end)
 
--- Function to determine who can see the announcement
 local function getTargetPlayers(source, visibility)
     local players = {}
     
     if visibility == 'all' then
-        -- All players
         for _, playerId in ipairs(GetPlayers()) do
             table.insert(players, tonumber(playerId))
         end
     elseif visibility == 'job' then
-        -- Only players from the same job
-        local xPlayer = ESX.GetPlayerFromId(source)
-        local jobName = xPlayer.job.name
+        local sourcePlayerData = getPlayerData(source)
+        local sourceJobName = getPlayerJob(sourcePlayerData)
         
         for _, playerId in ipairs(GetPlayers()) do
-            local targetPlayer = ESX.GetPlayerFromId(tonumber(playerId))
-            if targetPlayer and targetPlayer.job.name == jobName then
-                table.insert(players, tonumber(playerId))
+            local targetPlayerData = getPlayerData(tonumber(playerId))
+            if targetPlayerData then
+                local targetJobName = getPlayerJob(targetPlayerData)
+                if targetJobName == sourceJobName then
+                    table.insert(players, tonumber(playerId))
+                end
             end
         end
     else
-        -- Specific job
         for _, playerId in ipairs(GetPlayers()) do
-            local targetPlayer = ESX.GetPlayerFromId(tonumber(playerId))
-            if targetPlayer and targetPlayer.job.name == visibility then
-                table.insert(players, tonumber(playerId))
+            local targetPlayerData = getPlayerData(tonumber(playerId))
+            if targetPlayerData then
+                local targetJobName = getPlayerJob(targetPlayerData)
+                if targetJobName == visibility then
+                    table.insert(players, tonumber(playerId))
+                end
             end
         end
     end
@@ -166,7 +188,6 @@ local function getTargetPlayers(source, visibility)
     return players
 end
 
--- Function to get category information
 local function getCategoryInfo(categoryData)
     if categoryData and categoryData.id == "custom" then
         return categoryData
@@ -174,11 +195,10 @@ local function getCategoryInfo(categoryData)
     return nil
 end
 
--- Event to create announcement from interface
 RegisterNetEvent('lux-announces:createAnnounce')
 AddEventHandler('lux-announces:createAnnounce', function(data)
     local source = source
-    local xPlayer = ESX.GetPlayerFromId(source)
+    local playerData = getPlayerData(source)
     
     local content = data.content or data
     local duration = data.duration or Config.DefaultDuration
@@ -186,23 +206,15 @@ AddEventHandler('lux-announces:createAnnounce', function(data)
     local category = data.category
     
     if not content or content == "" then
-        TriggerClientEvent('ox_lib:notify', source, {
-            position = 'bottom-right',
-            description = Config.Texts.Notifications.NoContent,
-            type = 'error'
-        })
+        sendNotification(source, Config.Texts.Notifications.NoContent, 'error')
         return
     end
 
-    local jobName = xPlayer.job.name
+    local jobName = getPlayerJob(playerData)
     local jobInfo = announces[jobName]
 
     if not jobInfo then
-        TriggerClientEvent('ox_lib:notify', source, {
-            position = 'bottom-right',
-            description = Config.Texts.Notifications.NoPermission,
-            type = 'error'
-        })
+        sendNotification(source, Config.Texts.Notifications.NoPermission, 'error')
         return
     end
 
@@ -217,7 +229,6 @@ AddEventHandler('lux-announces:createAnnounce', function(data)
         gpsText = Config.Texts.Interface.GPSButtonText
     }
 
-    -- Add category if it exists and is enabled
     if Config.EnableCategories and category then
         local categoryInfo = getCategoryInfo(category)
         if categoryInfo then
@@ -225,22 +236,18 @@ AddEventHandler('lux-announces:createAnnounce', function(data)
         end
     end
 
-    -- Get target players according to visibility
     local targetPlayers = getTargetPlayers(source, visibility)
     
-    -- Send announcement only to target players
     for _, playerId in ipairs(targetPlayers) do
         TriggerClientEvent('lux-announces:showAd', playerId, adData)
     end
 
-    -- Confirmation message with visibility and category information
     local visibilityMessage = Config.Texts.Notifications.VisibilityAll
     local categoryMessage = ''
     
     if visibility == 'job' then
         visibilityMessage = Config.Texts.Notifications.VisibilityJob
     elseif visibility ~= 'all' then
-        -- Search for the specific job label
         local allJobs = getAllJobs()
         for _, job in ipairs(allJobs) do
             if job.name == visibility then
@@ -254,46 +261,27 @@ AddEventHandler('lux-announces:createAnnounce', function(data)
         categoryMessage = string.format(Config.Texts.Notifications.PublishSuccessWithCategory, category.name)
     end
     
-    TriggerClientEvent('ox_lib:notify', source, {
-        position = 'bottom-right',
-        description = string.format(Config.Texts.Notifications.PublishSuccess, categoryMessage, visibilityMessage),
-        type = 'success'
-    })
+    sendNotification(source, string.format(Config.Texts.Notifications.PublishSuccess, categoryMessage, visibilityMessage), 'success')
 end)
 
--- Command to filter announcements by category (for future implementations)
 RegisterCommand('filterannounce', function(source, args)
     local categoryId = args[1]
     
     if not categoryId then
-        TriggerClientEvent('ox_lib:notify', source, {
-            position = 'bottom-right',
-            description = Config.Texts.Notifications.FilterUsage,
-            type = 'info'
-        })
+        sendNotification(source, Config.Texts.Notifications.FilterUsage, 'info')
         return
     end
     
     local categoryInfo = getCategoryInfo(categoryId)
     if not categoryInfo then
-        TriggerClientEvent('ox_lib:notify', source, {
-            position = 'bottom-right',
-            description = Config.Texts.Notifications.CategoryNotFound,
-            type = 'error'
-        })
+        sendNotification(source, Config.Texts.Notifications.CategoryNotFound, 'error')
         return
     end
     
-    -- Here you can implement the filtering logic
-    TriggerClientEvent('ox_lib:notify', source, {
-        position = 'bottom-right',
-        description = string.format(Config.Texts.Notifications.FilterApplied, categoryInfo.name),
-        type = 'success'
-    })
+    sendNotification(source, string.format(Config.Texts.Notifications.FilterApplied, categoryInfo.name), 'success')
 end)
 
--- Initialize jobs cache on resource start
 Citizen.CreateThread(function()
-    Citizen.Wait(5000) -- Wait 5 seconds for database to be ready
+    Citizen.Wait(5000)
     getAllJobs()
 end)

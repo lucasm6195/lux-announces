@@ -1,6 +1,13 @@
 Config = {}
 
 -- ========================================
+-- FRAMEWORK CONFIGURATION
+-- ========================================
+
+-- Framework selection: 'esx' or 'qbcore'
+Config.Framework = 'qbcore'
+
+-- ========================================
 -- GENERAL CONFIGURATION
 -- ========================================
 

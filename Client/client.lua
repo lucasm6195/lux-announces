@@ -1,9 +1,27 @@
-Citizen.CreateThread(function()
-    while ESX.GetPlayerData().job == nil do
-        Citizen.Wait(0)
-    end
-    PlayerData = ESX.GetPlayerData()
-end)
+local ESX = nil
+local QBCore = nil
+local PlayerData = {}
+
+if Config.Framework == 'esx' then
+    ESX = exports['es_extended']:getSharedObject()
+    
+    Citizen.CreateThread(function()
+        while ESX.GetPlayerData().job == nil do
+            Citizen.Wait(0)
+        end
+        PlayerData = ESX.GetPlayerData()
+    end)
+elseif Config.Framework == 'qbcore' then
+    QBCore = exports['qb-core']:GetCoreObject()
+    
+    RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+        PlayerData = QBCore.Functions.GetPlayerData()
+    end)
+    
+    RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
+        PlayerData.job = JobInfo
+    end)
+end
 
 local lastCoords = nil
 local hasMarked = false
@@ -30,7 +48,6 @@ AddEventHandler('lux-announces:hideAd', function()
     hasMarked = false
 end)
 
--- New event to open creation interface
 RegisterNetEvent('lux-announces:openCreateInterface')
 AddEventHandler('lux-announces:openCreateInterface', function(jobData)
     SetNuiFocus(true, true)
@@ -45,13 +62,11 @@ RegisterNUICallback('marcarGPS', function(data, cb)
     cb({})
 end)
 
--- Callback to close creation interface
 RegisterNUICallback('closeCreateInterface', function(data, cb)
     SetNuiFocus(false, false)
     cb({})
 end)
 
--- Callback to create announcement - FIXED to send all data
 RegisterNUICallback('createAnnounce', function(data, cb)
     TriggerServerEvent('lux-announces:createAnnounce', data)
     SetNuiFocus(false, false)
@@ -61,21 +76,30 @@ end)
 function MarkAnnouncementGPS()
     if lastCoords then
         if hasMarked then
-            lib.notify({
-                description = Config.Texts.GPS.AlreadyMarked,
-                type = 'error',
-                position = 'bottom-right',
-            })
+            if Config.Framework == 'esx' then
+                lib.notify({
+                    description = Config.Texts.GPS.AlreadyMarked,
+                    type = 'error',
+                    position = 'bottom-right',
+                })
+            elseif Config.Framework == 'qbcore' then
+                QBCore.Functions.Notify(Config.Texts.GPS.AlreadyMarked, 'error')
+            end
             return
         end
         
         SetNewWaypoint(lastCoords.x, lastCoords.y)
         hasMarked = true
-        lib.notify({
-            description = Config.Texts.GPS.LocationMarked,
-            type = 'success',
-            position = 'bottom-right',
-        })
+        
+        if Config.Framework == 'esx' then
+            lib.notify({
+                description = Config.Texts.GPS.LocationMarked,
+                type = 'success',
+                position = 'bottom-right',
+            })
+        elseif Config.Framework == 'qbcore' then
+            QBCore.Functions.Notify(Config.Texts.GPS.LocationMarked, 'success')
+        end
     end
 end
 
