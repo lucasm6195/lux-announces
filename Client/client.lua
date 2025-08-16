@@ -12,7 +12,7 @@ else
     return
 end
 
--- Player data initialization based on framework
+
 if Config.Framework == "esx" then
     Citizen.CreateThread(function()
         while Framework.GetPlayerData().job == nil do

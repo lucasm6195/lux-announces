@@ -85,12 +85,15 @@ Config.Announces = {
 }
 ```
 
-```
+
 ### Framework Compatibility
 
 This resource supports multiple FiveM frameworks. Configure your framework in `config.lua`:
 
+```lua
+Config.Framework = "esx" --ESX, QBCORE or QBOX
 ```
+
 
 ### Duration Options
 
