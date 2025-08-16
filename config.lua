@@ -1,8 +1,18 @@
 Config = {}
 
 -- ========================================
+-- FRAMEWORK CONFIGURATION
+-- ========================================
+-- ESX, QBCORE or QBOX
+Config.Framework = "esx"
+
+-- ========================================
+
+
+-- ========================================
 -- GENERAL CONFIGURATION
 -- ========================================
+
 
 -- Command to create announcements
 Config.Command = "createannounce"
@@ -13,9 +23,6 @@ Config.DefaultDuration = 10
 -- ========================================
 -- DATABASE CONFIGURATION
 -- ========================================
-
--- Jobs table name (change if your server uses a different table name)
-Config.JobsTableName = "jobs"
 
 -- Cache duration for jobs in milliseconds (5 minutes = 300000)
 Config.JobsCacheDuration = 300000

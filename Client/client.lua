@@ -1,9 +1,74 @@
-Citizen.CreateThread(function()
-    while ESX.GetPlayerData().job == nil do
-        Citizen.Wait(0)
-    end
-    PlayerData = ESX.GetPlayerData()
-end)
+local Framework = nil
+local PlayerData = {}
+
+if Config.Framework == "esx" then
+    Framework = exports["es_extended"]:getSharedObject()
+elseif Config.Framework == "qbcore" then
+    Framework = exports["qb-core"]:GetCoreObject()
+elseif Config.Framework == "qbox" then
+    Framework = exports.qbx_core:GetCoreObject()
+else
+    print("^1[lux-announces]^7 Framework not found: " .. Config.Framework)
+    return
+end
+
+
+if Config.Framework == "esx" then
+    Citizen.CreateThread(function()
+        while Framework.GetPlayerData().job == nil do
+            Citizen.Wait(0)
+        end
+        PlayerData = Framework.GetPlayerData()
+    end)
+    
+    RegisterNetEvent('esx:playerLoaded')
+    AddEventHandler('esx:playerLoaded', function(xPlayer)
+        PlayerData = xPlayer
+    end)
+    
+    RegisterNetEvent('esx:setJob')
+    AddEventHandler('esx:setJob', function(job)
+        PlayerData.job = job
+    end)
+    
+elseif Config.Framework == "qbcore" then
+    Citizen.CreateThread(function()
+        PlayerData = Framework.Functions.GetPlayerData()
+        while PlayerData == nil or PlayerData.job == nil do
+            Citizen.Wait(100)
+            PlayerData = Framework.Functions.GetPlayerData()
+        end
+    end)
+    
+    RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
+    AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+        PlayerData = Framework.Functions.GetPlayerData()
+    end)
+    
+    RegisterNetEvent('QBCore:Client:OnJobUpdate')
+    AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo)
+        PlayerData.job = JobInfo
+    end)
+    
+elseif Config.Framework == "qbox" then
+    Citizen.CreateThread(function()
+        PlayerData = exports.qbx_core:GetPlayerData()
+        while PlayerData == nil or PlayerData.job == nil do
+            Citizen.Wait(100)
+            PlayerData = exports.qbx_core:GetPlayerData()
+        end
+    end)
+    
+    RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
+    AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+        PlayerData = exports.qbx_core:GetPlayerData()
+    end)
+    
+    RegisterNetEvent('QBCore:Client:OnJobUpdate')
+    AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo)
+        PlayerData.job = JobInfo
+    end)
+end
 
 local lastCoords = nil
 local hasMarked = false
@@ -57,6 +122,8 @@ RegisterNUICallback('createAnnounce', function(data, cb)
     SetNuiFocus(false, false)
     cb({})
 end)
+
+
 
 function MarkAnnouncementGPS()
     if lastCoords then
