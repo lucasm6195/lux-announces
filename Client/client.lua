@@ -51,7 +51,13 @@ elseif Config.Framework == "qbcore" then
     end)
     
 elseif Config.Framework == "qbox" then
-    PlayerData = exports.qbx_core:GetPlayerData()
+    Citizen.CreateThread(function()
+        PlayerData = exports.qbx_core:GetPlayerData()
+        while PlayerData == nil or PlayerData.job == nil do
+            Citizen.Wait(100)
+            PlayerData = exports.qbx_core:GetPlayerData()
+        end
+    end)
     
     RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
     AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
