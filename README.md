@@ -32,7 +32,6 @@ A modern and feature-rich announcement system for FiveM servers using ESX framew
 
 ## 📋 Requirements
 
-- **ESX Framework**: Latest version
 - **ox_lib**: For notifications and UI components
 - **ox_mysql**: For database operations (if needed)
 
@@ -84,6 +83,13 @@ Config.Announces = {
         image = "https://example.com/mechanic-logo.png" 
     },
 }
+```
+
+```
+### Framework Compatibility
+
+This resource supports multiple FiveM frameworks. Configure your framework in `config.lua`:
+
 ```
 
 ### Duration Options
