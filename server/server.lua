@@ -142,6 +142,8 @@ RegisterCommand(Config.Command, function(source, args)
         jobGrade = jobGrade,
         minGrade = minGrade,
         availableJobs = availableJobs,
+        shareLocation = jobInfo.shareLocation or false,
+        canModifyLocation = jobInfo.canModifyLocation or false,
         config = {
             enableCategories = Config.EnableCategories,
             enableDurationSelection = Config.EnableDurationSelection,
@@ -151,7 +153,7 @@ RegisterCommand(Config.Command, function(source, args)
             texts = Config.Texts
         }
     })
-end)
+end, false)
 
 local function getTargetPlayers(source, visibility)
     local players = {}
@@ -225,6 +227,7 @@ AddEventHandler('lux-announces:createAnnounce', function(data)
         content = content,
         image = jobInfo.image,
         duration = duration,
+		shareLocation = jobInfo.shareLocation or false,
         coords = { x = playerCoords.x, y = playerCoords.y, z = playerCoords.z },
         gpsText = Config.Texts.Interface.GPSButtonText
     }
@@ -279,7 +282,7 @@ RegisterCommand('filterannounce', function(source, args)
     end
     
     sendNotification(source, string.format(Config.Texts.Notifications.FilterApplied, categoryInfo.name), 'success')
-end)
+end, false)
 
 Citizen.CreateThread(function()
     Citizen.Wait(5000)
