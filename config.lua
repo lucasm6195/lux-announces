@@ -5,7 +5,7 @@ Config = {}
 -- ========================================
 
 -- Framework selection: 'esx' or 'qbcore'
-Config.Framework = 'qbcore'
+Config.Framework = 'esx'
 
 -- ========================================
 -- GENERAL CONFIGURATION
@@ -65,6 +65,7 @@ Config.Texts = {
         CategoryPreview = "Preview",
         ContentLabel = "Announcement Content",
         ContentPlaceholder = "Write your announcement content here...",
+		ShareLocationLabel = "Share announcement location with announcement....",
         DurationLabel = "Announcement Duration",
         VisibilityLabel = "Announcement Visibility",
         CancelButton = "Cancel",
@@ -108,7 +109,9 @@ Config.Announces = {
     unemployed = { 
         name = "Autoexotic", 
         image = "https://vignette.wikia.nocookie.net/de.gta/images/5/5c/Auto-Exotic-Logo.png/revision/latest?cb=20160715173735",
-        minGrade = 0
+        minGrade = 0,
+        shareLocation = true,         -- Default: show location checkbox checked
+        canModifyLocation = true      -- Allow user to change location checkbox
     },
     -- Add more jobs here following the format:
     -- jobname = { name = "Job Name", image = "Image_URL", minGrade = 0 },
@@ -117,16 +120,22 @@ Config.Announces = {
     -- police = { 
     --     name = "LSPD", 
     --     image = "https://example.com/police-logo.png",
-    --     minGrade = 2  -- Only sergeants and above can create announcements
+    --     minGrade = 2,  -- Only sergeants and above can create announcements
+    --     shareLocation = true,
+    --     canModifyLocation = false
     -- },
     -- ambulance = { 
     --     name = "EMS", 
     --     image = "https://example.com/ems-logo.png",
-    --     minGrade = 1  -- Only paramedics and above
+    --     minGrade = 1,  -- Only paramedics and above
+    --     shareLocation = false,
+    --     canModifyLocation = true
     -- },
     -- mechanic = { 
     --     name = "Mechanic", 
     --     image = "https://example.com/mechanic-logo.png",
-    --     minGrade = 0  -- All ranks can create announcements
+    --     minGrade = 0,  -- All ranks can create announcements
+    --     shareLocation = true,
+    --     canModifyLocation = true
     -- },
 }

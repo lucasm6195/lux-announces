@@ -25,11 +25,13 @@ end
 
 local lastCoords = nil
 local hasMarked = false
+local shareLocation = false
 
 RegisterNetEvent('lux-announces:showAd')
 AddEventHandler('lux-announces:showAd', function(adData)
     lastCoords = adData.coords
     hasMarked = false
+	shareLocation = adData.shareLocation or false
 
     SendNUIMessage({
         type = adData.type,
@@ -74,6 +76,18 @@ RegisterNUICallback('createAnnounce', function(data, cb)
 end)
 
 function MarkAnnouncementGPS()
+    if not shareLocation then
+        if Config.Framework == 'esx' then
+            lib.notify({
+                description = Config.Texts.GPS.NotAllowed or 'No puedes marcar la ubicación de este anuncio.',
+                type = 'error',
+                position = 'bottom-right',
+            })
+        elseif Config.Framework == 'qbcore' then
+            QBCore.Functions.Notify(Config.Texts.GPS.NotAllowed or 'No puedes marcar la ubicación de este anuncio.', 'error')
+        end
+        return
+    end
     if lastCoords then
         if hasMarked then
             if Config.Framework == 'esx' then
@@ -87,10 +101,10 @@ function MarkAnnouncementGPS()
             end
             return
         end
-        
+
         SetNewWaypoint(lastCoords.x, lastCoords.y)
         hasMarked = true
-        
+		
         if Config.Framework == 'esx' then
             lib.notify({
                 description = Config.Texts.GPS.LocationMarked,

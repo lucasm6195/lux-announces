@@ -46,6 +46,19 @@ A modern and feature-rich announcement system for FiveM servers using ESX framew
 3. **Configure** the resource by editing `config.lua`
 4. **Restart** your server
 
+# 📝 Updates & Contributors
+
+## Updates
+
+- Added location sharing control per job (`shareLocation` and `canModifyLocation`)
+- Improved UI logic for GPS button and location checkbox
+- Fixed announce timeout logic to prevent premature hiding
+- Added configuration comments and documentation
+
+## Contributors
+- [IOxee](https://github.com/IOxee) — Updated location sharing logic, UI improvements, config documentation
+
+
 ## ⚙️ Configuration
 
 ### Basic Setup
@@ -73,15 +86,21 @@ Add jobs that can create announcements:
 Config.Announces = {
     police = { 
         name = "LSPD", 
-        image = "https://example.com/police-logo.png" 
+        image = "https://example.com/police-logo.png",
+        shareLocation = true,
+        canModifyLocation = true
     },
     ambulance = { 
         name = "EMS", 
-        image = "https://example.com/ems-logo.png" 
+        image = "https://example.com/ems-logo.png",
+        shareLocation = false,
+        canModifyLocation = true
     },
     mechanic = { 
         name = "Mechanic", 
-        image = "https://example.com/mechanic-logo.png" 
+        image = "https://example.com/mechanic-logo.png",
+        shareLocation = false,
+        canModifyLocation = false
     },
 }
 ```
